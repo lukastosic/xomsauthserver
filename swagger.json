@@ -5,6 +5,7 @@
     "title" : "Authentication server",
     "description" : "Xenosite authentication server"
   },
+  "host" : "localhost",
   "basePath" : "/auth",
   "produces" : [ "application/json" ],
   "paths" : {
