@@ -1,0 +1,451 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "version" : "0.2",
+    "title" : "Authentication server",
+    "description" : "Xenosite authentication server"
+  },
+  "basePath" : "/auth",
+  "produces" : [ "application/json" ],
+  "paths" : {
+    "/users" : {
+      "get" : {
+        "summary" : "Get list of users",
+        "tags" : [ "users" ],
+        "description" : "Getting list of users from the system. Internally based on the provided authentication token, proper restrictions will be imposed such as user in reseller role, can only see end customers that belong to his Reseller company (and its Dealer companies). etc.\n",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "header",
+          "description" : "Login authentication token",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "amount",
+          "in" : "query",
+          "type" : "number",
+          "format" : "integer",
+          "description" : "Number of users to return."
+        }, {
+          "name" : "skipamount",
+          "in" : "query",
+          "type" : "number",
+          "format" : "integer",
+          "description" : "Number of users to skip. Use this parameter for pagination of results"
+        }, {
+          "name" : "role",
+          "in" : "query",
+          "type" : "string",
+          "description" : "Show only users in specific role"
+        }, {
+          "name" : "company",
+          "in" : "query",
+          "type" : "string",
+          "description" : "Show only users that belong to specific company."
+        }, {
+          "name" : "active",
+          "in" : "query",
+          "type" : "number",
+          "format" : "integer",
+          "description" : "Filter active/inactive users. Active=1, Inactive=0"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "An array of users",
+            "schema" : {
+              "$ref" : "#/definitions/GetUsersResponse"
+            }
+          },
+          "400" : {
+            "description" : "Bad request",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "404" : {
+            "description" : "No users",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized (token cannot be verified)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "403" : {
+            "description" : "Forbidden (token is good, but not enough rights to execute request)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "500" : {
+            "description" : "Internal server error (Error while processing function)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Insert new user",
+        "tags" : [ "users" ],
+        "description" : "Inserting new user information.\n* To create new user you don't need token. Everyobody can create new users. In that case user has \"End customer\" role and it cannot be assigned to any company. \n* Only resellers, providers, dealers and admins can assign user to relevant company, change role/status etc.\n",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "header",
+          "description" : "Login authentication token",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "PostUserData",
+          "in" : "body",
+          "description" : "Body post data with user information",
+          "schema" : {
+            "$ref" : "#/definitions/BasicUserPost"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Single user information",
+            "schema" : {
+              "$ref" : "#/definitions/BasicUserResponse"
+            }
+          },
+          "400" : {
+            "description" : "Bad request",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized (token cannot be verified)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "403" : {
+            "description" : "Forbidden (token is good, but not enough rights to execute request)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "500" : {
+            "description" : "Internal server error (Error while processing function)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          }
+        }
+      }
+    },
+    "/users/{username}" : {
+      "get" : {
+        "summary" : "Get single user information",
+        "tags" : [ "users" ],
+        "description" : "Getting information for single user",
+        "parameters" : [ {
+          "name" : "token",
+          "description" : "Login authentication token",
+          "in" : "header",
+          "type" : "string",
+          "required" : true
+        }, {
+          "name" : "username",
+          "in" : "path",
+          "description" : "Username of user account to be displayed",
+          "type" : "string",
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "User found and displayed",
+            "schema" : {
+              "$ref" : "#/definitions/BasicUserResponse"
+            }
+          },
+          "400" : {
+            "description" : "Bad request",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "404" : {
+            "description" : "User not found",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized (token cannot be verified)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "403" : {
+            "description" : "Forbidden (token is good, but not enough rights to execute request)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "500" : {
+            "description" : "Internal server error (Error while processing function)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          }
+        }
+      },
+      "put" : {
+        "summary" : "Updating single user account",
+        "tags" : [ "users" ],
+        "description" : "Posting user information that contains data that will be updated on the user. Post body doesn't need to contain fields that are not changed. If you want to change only email address, then you can only include email address in post body.",
+        "parameters" : [ {
+          "name" : "token",
+          "description" : "Login authentication token",
+          "in" : "header",
+          "type" : "string",
+          "required" : true
+        }, {
+          "name" : "username",
+          "description" : "Username of user that will be updated",
+          "in" : "path",
+          "type" : "string",
+          "required" : true
+        }, {
+          "name" : "UserUpdatePostBody",
+          "description" : "Body post data that contains information to be updated",
+          "in" : "body",
+          "schema" : {
+            "$ref" : "#/definitions/BasicUserPost"
+          },
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Update completed successfuly",
+            "schema" : {
+              "$ref" : "#/definitions/BasicUserResponse"
+            }
+          },
+          "400" : {
+            "description" : "Bad request",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "404" : {
+            "description" : "User not found",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized (token cannot be verified)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "403" : {
+            "description" : "Forbidden (token is good, but not enough rights to execute request)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "500" : {
+            "description" : "Internal server error (Error while processing function)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          }
+        }
+      },
+      "delete" : {
+        "summary" : "Deactivate user account",
+        "tags" : [ "users" ],
+        "description" : "This action will change active status of user. Deleting user effectivly means taht certain user cannot login anymore.",
+        "parameters" : [ {
+          "name" : "token",
+          "description" : "Login authentication token",
+          "in" : "header",
+          "type" : "string",
+          "required" : true
+        }, {
+          "name" : "username",
+          "description" : "Username of user account that will be deactivated",
+          "in" : "path",
+          "type" : "string",
+          "required" : true
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "User successfuly deactivated",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "400" : {
+            "description" : "Bad request",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "404" : {
+            "description" : "User not found",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized (token cannot be verified)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "403" : {
+            "description" : "Forbidden (token is good, but not enough rights to execute request)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "500" : {
+            "description" : "Internal server error (Error while processing function)",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/MessageResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "MessageResponse" : {
+      "type" : "object",
+      "properties" : {
+        "code" : {
+          "type" : "integer",
+          "description" : "Code number of the message. Usually they will overlap standard HTTP response codes, but we might add our own custom error message codes."
+        },
+        "message" : {
+          "type" : "string",
+          "description" : "Full text of the message"
+        }
+      }
+    },
+    "GetUsersResponse" : {
+      "type" : "object",
+      "properties" : {
+        "UserData" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/BasicUser"
+          }
+        },
+        "Message" : {
+          "$ref" : "#/definitions/MessageResponse"
+        }
+      }
+    },
+    "BasicUser" : {
+      "type" : "object",
+      "properties" : {
+        "username" : {
+          "type" : "string"
+        },
+        "email" : {
+          "type" : "string"
+        },
+        "created" : {
+          "type" : "string"
+        },
+        "last_modified" : {
+          "type" : "string"
+        },
+        "first_name" : {
+          "type" : "string"
+        },
+        "last_name" : {
+          "type" : "string"
+        },
+        "company_id" : {
+          "type" : "string",
+          "description" : "extenrnal_key of the company"
+        },
+        "role_id" : {
+          "type" : "integer"
+        },
+        "role_name" : {
+          "type" : "string"
+        }
+      }
+    },
+    "BasicUserPost" : {
+      "type" : "object",
+      "properties" : {
+        "username" : {
+          "type" : "string"
+        },
+        "password" : {
+          "type" : "string"
+        },
+        "email" : {
+          "type" : "string"
+        },
+        "first_name" : {
+          "type" : "string"
+        },
+        "last_name" : {
+          "type" : "string"
+        },
+        "company_id" : {
+          "type" : "string",
+          "description" : "extenrnal_key of the company"
+        },
+        "role_id" : {
+          "type" : "integer"
+        }
+      }
+    },
+    "BasicUserResponse" : {
+      "type" : "object",
+      "properties" : {
+        "UserData" : {
+          "$ref" : "#/definitions/BasicUser"
+        },
+        "Message" : {
+          "$ref" : "#/definitions/MessageResponse"
+        }
+      }
+    }
+  }
+}
